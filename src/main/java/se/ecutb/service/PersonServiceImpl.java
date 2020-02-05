@@ -69,30 +69,53 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public List<PersonDtoWithTodo> findPeopleWithAssignedTodos() {
-        return null;
+        List<Todo> todoList = todoRepository.findAll().stream()
+                .collect(Collectors.toList());
+        List<PersonDtoWithTodo> personDtoWithTodoList = personRepository.findAll().stream()
+                .map(person -> personDtoConversionService.convertToPersonDtoWithTodo(person,todoList))
+                .collect(Collectors.toList());
+
+        return personDtoWithTodoList.stream()
+                .filter(personDtoWithTodo -> personDtoWithTodo.getAssignedTodo().size() != 0)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<PersonDto> findAllPeopleWithNoTodos() {
-         return personRepository.findAll().stream()
-                .map(person -> personDtoConversionService.convertToPersonDtoWithTodo(person,todoRepository.findAll()))
-                .filter(todoRepo -> todoRepo.getAssignedTodo() == null)
-                 .map(personDtoWithTodo -> new PersonDto(personDtoWithTodo.getPersonId(),personDtoWithTodo.getFirstName(),personDtoWithTodo.getLastName()))
+        List<Todo> todoList = todoRepository.findAll().stream()
+                .collect(Collectors.toList());
+        List<PersonDtoWithTodo> personDtoWithTodoList = personRepository.findAll().stream()
+                .map(person -> personDtoConversionService.convertToPersonDtoWithTodo(person,todoList))
+                .collect(Collectors.toList());
+
+        return personDtoWithTodoList.stream()
+                .filter(personDtoWithTodo -> personDtoWithTodo.getAssignedTodo().size() == 0)
+                .map(personDtoWithTodo -> personDtoConversionService.convertToPersonDto(personRepository.findById(personDtoWithTodo.getPersonId()).get()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<PersonDto> findPeopleByAddress(Address address) {
-        return personRepository.findAll().stream()
-                .filter(person -> person.getAddress().equals(address))
-                .map(person -> personDtoConversionService.convertToPersonDto(person))
-                .collect(Collectors.toList());
+        if (address != null){
+            return personRepository.findAll().stream()
+                    .filter(person -> person.getAddress() != null &&
+                            person.getAddress().equals(address))
+                    .map(person -> personDtoConversionService.convertToPersonDto(person))
+                    .collect(Collectors.toList());
+        }else{
+            return personRepository.findAll().stream()
+                    .filter(person -> person.getAddress() == null)
+                    .map(person -> personDtoConversionService.convertToPersonDto(person))
+                    .collect(Collectors.toList());
+        }
+
     }
 
     @Override
     public List<PersonDto> findPeopleByCity(String city) {
         return personRepository.findAll().stream()
-                .filter(person -> person.getAddress().getCity().equalsIgnoreCase(city))
+                .filter(person -> person.getAddress() != null
+                        && person.getAddress().getCity().equalsIgnoreCase(city))
                 .map(person -> personDtoConversionService.convertToPersonDto(person))
                 .collect(Collectors.toList());
     }

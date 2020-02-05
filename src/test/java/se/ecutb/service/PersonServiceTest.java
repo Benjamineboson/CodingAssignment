@@ -78,14 +78,12 @@ public class PersonServiceTest {
     @Test
     public void given_email_findByEmail_return_Person(){
         String email = "test@gmail.com";
-
         assertEquals(testPerson, testObject.findByEmail(email));
     }
 
     @Test
     public void findPeopleWithAssignedTodos_return_list_size_3(){
         List<PersonDtoWithTodo> result = testObject.findPeopleWithAssignedTodos();
-
         assertEquals(3, result.size());
     }
 
