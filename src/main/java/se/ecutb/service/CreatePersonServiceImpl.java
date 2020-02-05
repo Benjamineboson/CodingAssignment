@@ -15,15 +15,12 @@ public class CreatePersonServiceImpl extends AbstractPersonFactory implements Cr
 
     private PersonRepository personRepository;
     private IdSequencers idSequencers;
-    private AbstractPersonFactory abstractPersonFactory;
 
     @Autowired
     public CreatePersonServiceImpl(PersonRepository personRepository, IdSequencers idSequencers) {
         this.personRepository = personRepository;
         this.idSequencers = idSequencers;
     }
-
-
 
     @Override
     public Person create(String firstName, String lastName, String email) throws IllegalArgumentException {
